@@ -1,0 +1,33 @@
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Environment variables
+env
+
+# Logs
+logs/
+*.log
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build artifacts
+dist/
+build/
+
+# Editor directories
+.vscode/
+.idea/
+.DS_Store
+
+# Python (if applicable)
+__pycache__/
+.venv/
+env/
+*.pyc
+
+static cdn/
+static_my_project/
+static/

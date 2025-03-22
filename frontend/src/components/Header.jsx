@@ -1,8 +1,9 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Container, Nav, Navbar, Form, FormControl, Button } from 'react-bootstrap';
+import { Container, Nav, Navbar, Button } from 'react-bootstrap';
 import { logout } from '../actions/userActions';
+import SearchBox from '../components/SearchBox';  // Import the search box component
 
 function Header() {
     const dispatch = useDispatch();
@@ -10,13 +11,10 @@ function Header() {
 
     const userLogin = useSelector(state => state.userLogin);
     const { userInfo } = userLogin;
-    console.log(userInfo);  // Check if userInfo has username
-
-
 
     const logoutHandler = () => {
         dispatch(logout());
-        navigate('/login'); // Redirect to login page after logout
+        navigate('/login');
     };
 
     return (
@@ -31,18 +29,17 @@ function Header() {
                                 <i className="fa-solid fa-user"></i> Account
                             </Link>
                         )}
+
+                        {userInfo && (userInfo.role === 'Seller' || userInfo.role === 'admin') && (
+                            <Link to="/create-listing" className="nav-link">
+                                <i className="fa-solid fa-plus"></i> Create Listing
+                            </Link>
+                        )}
                     </Nav>
 
-                    <Form className="d-flex me-3">
-                        <FormControl
-                            type="search"
-                            placeholder="Search Listings..."
-                            className="me-2"
-                            aria-label="Search"
-                        />
-                        <Button variant="outline-light">Search</Button>
-                    </Form>
-                    {/* ✅ Display Login or Logout */}
+                    {/* Use the SearchBox component here */}
+                    <SearchBox />
+
                     {userInfo ? (
                         <>
                             <span className="text-white me-3">Welcome, {userInfo.username}</span>

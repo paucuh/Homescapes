@@ -11,3 +11,22 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.house-card {
+  width: 18rem;
+  min-height: 350px;
+}
+
+.house-image {
+  height: 200px;
+  object-fit: cover;
+}
+
+.house-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.house-price {
+  color: #333;
+}

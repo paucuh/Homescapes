@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { Col, Row, Container } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Loader from '../components/Loader';
 import Message from '../components/Message';
@@ -31,11 +30,6 @@ function HomeScreen() {
               </Col>
             ))}
           </Row>
-          <div className="mt-4">
-            <Link to="/users" className="btn btn-primary">
-              View Users
-            </Link>
-          </div>
         </>
       )}
     </Container>

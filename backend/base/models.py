@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 import os
 import random
+from django.core.exceptions import ValidationError
 
 def get_filename_ext(filepath):
     base_name = os.path.basename(filepath)
@@ -44,16 +45,23 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     objects = CustomUserManager()
 
-    USERNAME_FIELD = 'email'                 # ✅ Important
-    REQUIRED_FIELDS = ['username', 'role']   # ✅ Important
-
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username', 'role']
 class House(models.Model):
+    lister = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True)
     _id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100, null=True, blank=True)
     address = models.CharField(max_length=200, null=True, blank=True)
-    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    price = models.DecimalField(max_digits=100, decimal_places=2, null=True, blank=True)
     image = models.ImageField(upload_to=upload_image_path, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        # Check if the user has the 'Seller' role before saving the house
+        if self.lister and self.lister.role != 'Seller':
+            raise ValidationError('Only users with the Seller role can list houses.')
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name

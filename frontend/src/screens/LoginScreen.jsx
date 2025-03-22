@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Form, Button, Row, Col, Card, InputGroup } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import Loader from '../components/Loader'
@@ -12,20 +12,22 @@ function LoginScreen() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
-    const location = useLocation()
-    const redirect = location.search ? location.search.split('=')[1] : '/'
+    const navigate = useNavigate()
+    const dispatch = useDispatch()
 
     const userLogin = useSelector(state => state.userLogin)
     const { error, loading, userInfo } = userLogin
 
-    const navigate = useNavigate()
-    const dispatch = useDispatch()
-
     useEffect(() => {
         if (userInfo) {
-            navigate(redirect)
+            // ✅ Role-based redirect
+            if (userInfo.role === 'Seller') {
+                navigate('/create-listing')
+            } else {
+                navigate('/')
+            }
         }
-    }, [navigate, userInfo, redirect])
+    }, [navigate, userInfo])
 
     const submitHandler = (e) => {
         e.preventDefault()
@@ -76,7 +78,7 @@ function LoginScreen() {
                 <Row className="py-3 text-center">
                     <Col>
                         New Customer?{' '}
-                        <Link to={redirect ? `/register?redirect=${redirect}` : '/register'} className="text-primary">
+                        <Link to="/register" className="text-primary">
                             Register Here
                         </Link>
                     </Col>

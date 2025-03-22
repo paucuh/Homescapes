@@ -1,13 +1,18 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import { thunk } from 'redux-thunk'
-import { houseListReducer, houseDetailReducer } from './reducers/houseReducers'
-import { userLoginReducer, userProfileReducer } from './reducers/userReducers'
+import { houseListReducer, houseDetailReducer, houseCreateReducer, houseSearchReducer, userHousesReducer, houseUpdateReducer } from './reducers/houseReducers'
+import { userLoginReducer, userProfileReducer, userRegisterReducer } from './reducers/userReducers'
 
 const reducer = combineReducers({
     houseList: houseListReducer,
     houseDetail: houseDetailReducer,
     userLogin: userLoginReducer,
-    userProfile: userProfileReducer
+    userProfile: userProfileReducer,
+    houseCreate: houseCreateReducer,
+    userRegister: userRegisterReducer,
+    houseSearch: houseSearchReducer,
+    userHouses: userHousesReducer,
+    houseUpdate: houseUpdateReducer,
 })
 
 const userInfoFromStorage = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null

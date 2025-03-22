@@ -31,13 +31,12 @@ function Header() {
                                 <i className="fa-solid fa-user"></i> Account
                             </Link>
                         )}
-                        <Link to="/browse" className="nav-link">Browse</Link>
                     </Nav>
 
                     <Form className="d-flex me-3">
                         <FormControl
                             type="search"
-                            placeholder="Search movies..."
+                            placeholder="Search Listings..."
                             className="me-2"
                             aria-label="Search"
                         />

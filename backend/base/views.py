@@ -32,8 +32,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         except CustomUser.DoesNotExist:
             raise AuthenticationFailed('User does not exist')
 
-        # Optional: You can also check if the password is wrong here
-        user = authenticate(email=email, password=password)
+        user = authenticate(username=email, password=password)
         if not user:
             raise AuthenticationFailed('Invalid password')
 
@@ -52,13 +51,15 @@ class MyTokenObtainPairView(TokenObtainPairView):
 @api_view(['POST'])
 def registerUser(request):
     data = request.data
-    user = CustomUser.objects.create(
+    user = CustomUser.objects.create_user(
         username=data['username'],
         email=data['email'],
-        password=data['password']
+        password=data['password'],
+        role=data.get('role', 'Buyer')
     )
     serializer = UserSerializerWithToken(user, many=False)
     return Response(serializer.data)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

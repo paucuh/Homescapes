@@ -12,6 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
     _id = serializers.SerializerMethodField(read_only=True)
     isAdmin = serializers.SerializerMethodField(read_only=True)
     role = serializers.SerializerMethodField(read_only=True)
+    email = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = CustomUser
@@ -28,6 +29,9 @@ class UserSerializer(serializers.ModelSerializer):
     
     def get_role(self, obj):
         return obj.role
+    
+    def get_email(self, obj):
+        return obj.email
     
 class UserSerializerWithToken(UserSerializer):
     token = serializers.SerializerMethodField(read_only=True)

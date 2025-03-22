@@ -27,7 +27,3 @@ __pycache__/
 .venv/
 env/
 *.pyc
-
-static cdn/
-static_my_project/
-static/

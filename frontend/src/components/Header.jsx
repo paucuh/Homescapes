@@ -35,6 +35,13 @@ function Header() {
                                 <i className="fa-solid fa-plus"></i> Create Listing
                             </Link>
                         )}
+
+                        {/* ✅ New Messages Nav Link */}
+                        {userInfo && (
+                            <Link to="/messages" className="nav-link">
+                                <i className="fa-solid fa-comments"></i> Messages
+                            </Link>
+                        )}
                     </Nav>
 
                     {/* Use the SearchBox component here */}

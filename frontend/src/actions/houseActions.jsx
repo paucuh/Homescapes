@@ -145,3 +145,26 @@ export const updateHouse = (id, houseData) => async (dispatch, getState) => {
         });
     }
 };
+
+export const deleteHouse = (id) => async (dispatch, getState) => {
+    try {
+        dispatch({ type: 'HOUSE_DELETE_REQUEST' });
+
+        const { userLogin: { userInfo } } = getState();
+
+        const config = {
+            headers: {
+                Authorization: `Bearer ${userInfo.token}`,
+            },
+        };
+
+        await axios.delete(`/api/houses/delete/${id}/`, config);
+
+        dispatch({ type: 'HOUSE_DELETE_SUCCESS' });
+    } catch (error) {
+        dispatch({
+            type: 'HOUSE_DELETE_FAIL',
+            payload: error.response?.data?.detail || error.message,
+        });
+    }
+};

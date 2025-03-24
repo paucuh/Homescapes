@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { updateHouse, listHouseDetails } from "../actions/houseActions";  
+import { updateHouse, listHouseDetails, deleteHouse } from "../actions/houseActions";  
 import Loader from "../components/Loader";
 import Message from "../components/Message";
 import { Form, Button, Card, InputGroup, Row, Col } from "react-bootstrap";
@@ -50,6 +50,13 @@ const UpdateHouseScreen = () => {
         if (name !== house.name || address !== house.address || price !== house.price || description !== house.description) {
             const houseData = { name, address, price, description };
             dispatch(updateHouse(id, houseData));  // Dispatch update action only if something changed
+        }
+    };
+
+    const deleteHandler = () => {
+        if (window.confirm("Are you sure you want to delete this listing?")) {
+            dispatch(deleteHouse(id));
+            navigate("/profile");  // Redirect after deletion
         }
     };
 
@@ -141,6 +148,13 @@ const UpdateHouseScreen = () => {
 
                                     <Button type="submit" className="w-100 btn-primary rounded shadow-sm">
                                         Update Listing
+                                    </Button>
+                                    <Button
+                                        variant="danger"
+                                        className="w-100 mt-3"
+                                        onClick={deleteHandler}
+                                    >
+                                        Delete Listing
                                     </Button>
                                 </Form>
                             </Col>

@@ -43,3 +43,17 @@ class UserSerializerWithToken(UserSerializer):
     def get_token(self, obj):
         token = RefreshToken.for_user(obj)
         return str(token.access_token)
+    
+class ChatRoomSerializer(serializers.ModelSerializer):
+    buyer = UserSerializer(many=False, read_only=True)
+    seller = UserSerializer(many=False, read_only=True)
+    class Meta:
+        model = ChatRoom
+        fields = '__all__'
+
+class MessageSerializer(serializers.ModelSerializer):
+    sender = UserSerializer(many=False, read_only=True)
+    room = ChatRoomSerializer(many=False, read_only=True)
+    class Meta:
+        model = Message
+        fields = '__all__'

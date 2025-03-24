@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { listUserHouses } from "../actions/houseActions";  // Import action for fetching user houses
+import { listUserHouses } from "../actions/houseActions";
 import { getUserProfile } from "../actions/userActions";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
-import { Link } from "react-router-dom";  // Import Link from react-router-dom
-import { Card, Row, Col, Container } from "react-bootstrap";  // Import bootstrap components
+import { Link } from "react-router-dom";
+import { Card, Row, Col, Container } from "react-bootstrap";
 import "../screens_css/ProfileScreen.css";
 
 function ProfileScreen() {
@@ -19,7 +19,7 @@ function ProfileScreen() {
 
   useEffect(() => {
     dispatch(getUserProfile());
-    dispatch(listUserHouses());  // Fetch the user's houses on component mount
+    dispatch(listUserHouses());
   }, [dispatch]);
 
   return (
@@ -38,7 +38,7 @@ function ProfileScreen() {
             <p><strong>Role:</strong> {user.role}</p>
           </Card>
 
-          {/* Only render Listings if user is a seller */}
+          {/* Render Listings Only if User is a Seller */}
           {user.role.toLowerCase() === "seller" && (
             <>
               <h3 className="mt-4 text-primary">Your Listings</h3>
@@ -63,6 +63,7 @@ function ProfileScreen() {
                               <Card.Title>{house.name}</Card.Title>
                               <Card.Text>{house.address}</Card.Text>
                               <Card.Text>${house.price}</Card.Text>
+                              <Card.Text>{house.description}</Card.Text>
                               <Link to={`/house/update/${house._id}`} className="btn btn-primary w-100">
                                 Edit Listing
                               </Link>
@@ -78,12 +79,6 @@ function ProfileScreen() {
               )}
             </>
           )}
-          
-          {/* If the user is not a seller, skip rendering the listings */}
-          {user.role.toLowerCase() !== "seller" && (
-            <Message variant="info">You cannot view listings as you're not a seller.</Message>
-          )}
-          
         </>
       ) : (
         <Message variant="warning">No user data found</Message>

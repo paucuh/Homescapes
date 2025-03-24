@@ -75,11 +75,16 @@ class IsSeller(BasePermission):
         return request.user.is_authenticated and request.user.role == 'Seller'
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated, IsSeller])
+@permission_classes([IsAuthenticated])
 def create_house(request):
+    # Ensure only sellers can create
+    if request.user.role.lower() != 'seller':
+        return Response({'detail': 'Only sellers can create house listings.'}, status=status.HTTP_403_FORBIDDEN)
+
     serializer = HouseSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save()
+        # Set the lister to the logged-in user
+        serializer.save(lister=request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -152,3 +157,53 @@ def updateHouse(request, pk):
     
     except House.DoesNotExist:
         return Response({"detail": "House not found."}, status=status.HTTP_404_NOT_FOUND)
+    
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def deleteHouse(request, pk):
+    try:
+        house = House.objects.get(_id=pk)
+
+        if house.lister != request.user:
+            return Response(
+                {"detail": "You are not authorized to delete this listing."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        house.delete()
+        return Response({"detail": "House deleted successfully."}, status=status.HTTP_200_OK)
+
+    except House.DoesNotExist:
+        return Response({"detail": "House not found."}, status=status.HTTP_404_NOT_FOUND)
+    
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_chat_messages(request, room_id):
+    try:
+        buyer_id, seller_id = map(int, room_id.split('_'))
+
+        # Check both combinations (buyer-seller and seller-buyer)
+        chat_room = ChatRoom.objects.filter(buyer_id=buyer_id, seller_id=seller_id).first()
+        if not chat_room:
+            chat_room = ChatRoom.objects.filter(buyer_id=seller_id, seller_id=buyer_id).first()
+
+        if not chat_room:
+            return Response({'detail': 'Chat room does not exist.'}, status=404)
+
+        messages = chat_room.messages.all().order_by('timestamp')
+        serializer = MessageSerializer(messages, many=True)
+        return Response(serializer.data)
+    
+    except Exception as e:
+        print(f"❌ Error fetching messages: {e}")
+        return Response({'detail': 'Invalid room or server error.'}, status=400)
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_chat_rooms(request):
+    user = request.user
+    # ✅ Get all rooms where the user is either buyer or seller
+    chat_rooms = ChatRoom.objects.filter(models.Q(buyer=user) | models.Q(seller=user))
+    serializer = ChatRoomSerializer(chat_rooms, many=True)
+    return Response(serializer.data)

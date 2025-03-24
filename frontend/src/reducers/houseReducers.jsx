@@ -90,3 +90,16 @@ export const houseUpdateReducer = (state = {}, action) => {
             return state;
     }
 };
+
+export const houseDeleteReducer = (state = {}, action) => {
+    switch (action.type) {
+        case 'HOUSE_DELETE_REQUEST':
+            return { loading: true };
+        case 'HOUSE_DELETE_SUCCESS':
+            return { loading: false, success: true };
+        case 'HOUSE_DELETE_FAIL':
+            return { loading: false, error: action.payload };
+        default:
+            return state;
+    }
+};

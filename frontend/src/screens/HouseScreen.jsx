@@ -77,6 +77,14 @@ function HouseScreen() {
                                 </ListGroup.Item>
                             </ListGroup>
 
+                            {!isUserHouseCreator && house.lister && (
+                                <Link to={`/chat/${user?._id}/${house.lister}`}>
+                                    <Button variant="success" className="mt-3">
+                                        Chat with Seller
+                                    </Button>
+                                </Link>
+                            )}
+
                             {/* Show Edit button only if the user is the creator of the house */}
                             {isUserHouseCreator && (
                                 <Link to={`/house/update/${house._id}`}>

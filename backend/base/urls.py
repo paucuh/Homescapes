@@ -12,4 +12,7 @@ urlpatterns = [
     path('houses/search/', views.searchHouses, name='search'),
     path('user/houses/', views.getUserHouses, name='user-houses'),
     path('house/update/<str:pk>/', views.updateHouse, name='house-update'),
+    path('houses/delete/<str:pk>/', views.deleteHouse, name='delete-house'),
+    path('chats/', views.user_chat_rooms, name='get-all-chats'),
+    path('chat/<str:room_id>/', views.get_chat_messages, name='get-user-chats'),
 ]

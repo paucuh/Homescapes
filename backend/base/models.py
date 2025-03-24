@@ -57,7 +57,6 @@ class House(models.Model):
     description = models.TextField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
-        # Check if the user has the 'Seller' role before saving the house
         if self.lister and self.lister.role != 'Seller':
             raise ValidationError('Only users with the Seller role can list houses.')
 
@@ -65,3 +64,14 @@ class House(models.Model):
 
     def __str__(self):
         return self.name
+    
+class ChatRoom(models.Model):
+    buyer = models.ForeignKey(CustomUser, related_name='buyer', on_delete=models.CASCADE)
+    seller = models.ForeignKey(CustomUser, related_name='seller', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class Message(models.Model):
+    room = models.ForeignKey(ChatRoom, related_name='messages', on_delete=models.CASCADE)
+    sender = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)

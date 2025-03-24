@@ -10,6 +10,8 @@ import HouseCreateScreen from './screens/HouseCreateScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import SearchScreen from './screens/SearchScreen';
 import UpdateHouseScreen from './screens/UpdateHouseScreen';
+import ChatScreen from './screens/ChatScreen';
+import MessageHistoryScreen from './screens/MessageHistoryScreen';
 
 function App() {
   return (
@@ -26,6 +28,8 @@ function App() {
               <Route path='/register' element={<RegisterScreen/> } />
               <Route path="/search/:keyword" element={<SearchScreen />} />
               <Route path="/house/update/:id" element={<UpdateHouseScreen />} />
+              <Route path="/messages" element={<MessageHistoryScreen />} />
+              <Route path="/chat/:buyerId/:sellerId" element={<ChatScreen />} />
             </Routes>
           </Container>
         </main>

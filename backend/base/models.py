@@ -35,7 +35,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = (
         ('admin', 'Admin'),
         ('Buyer', 'Buyer'),
-        ('Seller', 'Seller'),
+        ('seller', 'Seller'),
     )
     username = models.CharField(max_length=30, unique=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='Buyer')

@@ -14,17 +14,17 @@ const ChatScreen = () => {
     const userLogin = useSelector((state) => state.userLogin);
     const { userInfo } = userLogin;
 
-    const { buyerId, sellerId } = useParams();
-    const roomName = buyerId < sellerId ? `${buyerId}_${sellerId}` : `${sellerId}_${buyerId}`;
+    const { buyerId, sellerId, houseId } = useParams();
+    const roomName = buyerId < sellerId 
+        ? `${buyerId}_${sellerId}_${houseId}` 
+        : `${sellerId}_${buyerId}_${houseId}`;
 
-    // ✅ Redirect to login if user is not logged in
     useEffect(() => {
         if (!userInfo) {
             navigate('/login');
         }
     }, [userInfo, navigate]);
 
-    // ✅ Fetch chat history
     useEffect(() => {
         if (!userInfo) return;
 

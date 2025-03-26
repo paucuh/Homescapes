@@ -18,12 +18,16 @@ const MessageHistoryScreen = () => {
 
   useEffect(() => {
     dispatch(fetchUserChatRooms());  // ✅ Load conversations list
+    console.log('Chats:', chats);
   }, [dispatch]);
   
   const handleChatClick = (chat) => {
     const buyerId = chat.buyer.id;
     const sellerId = chat.seller.id;
-    const roomId = buyerId < sellerId ? `${buyerId}/${sellerId}` : `${sellerId}/${buyerId}`;
+    const houseId = chat.house_id;  // ✅ Get house_id
+    const roomId = buyerId < sellerId 
+        ? `${buyerId}/${sellerId}/${houseId}` 
+        : `${sellerId}/${buyerId}/${houseId}`;
     navigate(`/chat/${roomId}`);
   };
 
@@ -56,13 +60,19 @@ const MessageHistoryScreen = () => {
                   key={chat.id}
                   action
                   onClick={() => handleChatClick(chat)}
-                  className="d-flex justify-content-between align-items-center"
+                  className="d-flex justify-content-between align-items-center flex-column align-items-start"
                 >
                   <div>
                     <strong>{otherUser.username}</strong> ({otherUser.role})
                   </div>
                   <div className="text-muted">
                     {new Date(chat.created_at).toLocaleDateString()}
+                  </div>
+                  <div>
+                    <strong>Message: </strong> {chat.last_message ? chat.last_message.content : 'No messages yet'}
+                  </div>
+                  <div className="mt-2">
+                    🏠 <strong>House:</strong> {chat.house_name || 'N/A'}
                   </div>
                 </ListGroup.Item>
               );

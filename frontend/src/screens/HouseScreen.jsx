@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { Col, Row, Image, ListGroup, Container, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import Loader from '../components/Loader';
@@ -8,28 +8,29 @@ import { listHouseDetails } from '../actions/houseActions';
 import { getUserProfile } from '../actions/userActions'; // To get user profile
 
 function HouseScreen() {
+    const navigate = useNavigate();
     const { id } = useParams();
     const dispatch = useDispatch();
 
-    // Get house details from Redux state
     const houseDetail = useSelector((state) => state.houseDetail);
     const { loading, error, house } = houseDetail;
 
-    // Get user profile from Redux state
     const userProfile = useSelector((state) => state.userProfile);
     const { user } = userProfile;
 
+    const addToOrderHandler = () => {
+        navigate(`/cart/${id}`);
+    }
+
     useEffect(() => {
-        dispatch(listHouseDetails(id));  // Fetch house details
-        dispatch(getUserProfile());  // Fetch logged-in user profile
+        dispatch(listHouseDetails(id));
+        dispatch(getUserProfile());
     }, [dispatch, id]);
 
-    // Check if the logged-in user is the creator of the house
-    const isUserHouseCreator = user && house && user._id === house.lister;
 
     return (
         <Container className="my-4">
-            {loading ? (
+            {(loading || !user || !house) ? (
                 <Loader />
             ) : error ? (
                 <Message variant="danger">{error}</Message>
@@ -75,24 +76,36 @@ function HouseScreen() {
                                     <strong>Location: </strong>
                                     <span className="text-info">{house.address}</span>
                                 </ListGroup.Item>
+                                <ListGroup.Item>
+                                    <strong>Availability: </strong>
+                                    <span className={house.available ? 'text-success' : 'text-danger'}>
+                                        {house.available ? 'Available' : 'Not Available'}
+                                    </span>
+                                </ListGroup.Item>
                             </ListGroup>
+                            <div className="d-flex gap-2">
+                                {house.available === true && user && house && user._id !== house.lister && house.lister && user.role?.toLowerCase() !== 'seller' && (
+                                        <Button variant="primary" className="mt-3" onClick={addToOrderHandler}>
+                                            Buy Now
+                                        </Button>
+                                )}
 
-                            {!isUserHouseCreator && house.lister && (
-                                <Link to={`/chat/${user?._id}/${house.lister}`}>
-                                    <Button variant="success" className="mt-3">
-                                        Chat with Seller
-                                    </Button>
-                                </Link>
-                            )}
+                                {user && house && user._id !== house.lister && house.lister && user.role?.toLowerCase() !== 'seller' && (
+                                    <Link to={`/chat/${user._id}/${house.lister}/${house._id}`}>
+                                        <Button variant="success" className="mt-3">
+                                            Chat with Seller
+                                        </Button>
+                                    </Link>
+                                )}
 
-                            {/* Show Edit button only if the user is the creator of the house */}
-                            {isUserHouseCreator && (
+                            {user && house && user._id === house.lister && (
                                 <Link to={`/house/update/${house._id}`}>
                                     <Button variant="primary" className="mt-3">
                                         Edit House
                                     </Button>
                                 </Link>
                             )}
+                            </div>
                         </Col>
                     </Row>
                 </>

@@ -7,6 +7,7 @@ urlpatterns = [
     path('users/login', views.MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('users/register', views.registerUser, name='register'),
     path('users/profile/', views.getUserProfile, name='user-profile'),
+    path('users/profile/update/', views.updateUserProfile, name='user-profile-update'),
     path('houses/create/', views.create_house, name='house-create'),
     path('users/register/', views.registerUser, name='register'),
     path('houses/search/', views.searchHouses, name='search'),
@@ -15,4 +16,8 @@ urlpatterns = [
     path('houses/delete/<str:pk>/', views.deleteHouse, name='delete-house'),
     path('chats/', views.user_chat_rooms, name='get-all-chats'),
     path('chat/<str:room_id>/', views.get_chat_messages, name='get-user-chats'),
+    path('orders/add/', views.addOrderItems, name='orders-add'),
+    path('order/<str:pk>/', views.getOrderbyId, name='user-order'),
+    path('orders/myorders/', views.getMyOrders, name='my-orders'),
+    path('orders/<str:pk>/pay/', views.updateOrderToPaid, name='order-pay'),
 ]

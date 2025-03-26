@@ -1,6 +1,6 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .models import CustomUser, ChatRoom, Message
+from .models import CustomUser, ChatRoom, Message, House
 from channels.db import database_sync_to_async
 from django.utils import timezone
 
@@ -55,13 +55,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
             sender = CustomUser.objects.get(id=sender_id)
 
             # 🔥 Extract IDs from the room_id (example: "8_9")
-            id1, id2 = map(int, self.room_id.split('_'))
+            id1, id2, house_id = map(int, self.room_id.split('_'))
 
             # 🔥 Fetch both users
             user1 = CustomUser.objects.get(id=id1)
             user2 = CustomUser.objects.get(id=id2)
 
-            # 🔥 Determine which is buyer and which is seller based on roles
+            house = House.objects.get(_id=house_id)
+
             if user1.role == 'Buyer' and user2.role == 'Seller':
                 buyer, seller = user1, user2
             elif user2.role == 'Buyer' and user1.role == 'Seller':
@@ -73,6 +74,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             chat_room, created = ChatRoom.objects.get_or_create(
                 buyer=buyer,
                 seller=seller,
+                house=house,
                 defaults={'created_at': timezone.now()}
             )
             print(f"✅ ChatRoom ID: {chat_room.id} | Created: {created}")

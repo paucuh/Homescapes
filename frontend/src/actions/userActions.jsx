@@ -93,6 +93,46 @@ export const getUserProfile = () => async (dispatch, getState) => {
   }
 };
 
+export const updateUserProfile = (user) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: USER_PROFILE_REQUEST });
+
+    const {
+      userLogin: { userInfo },
+    } = getState();
+
+    if (!userInfo || !userInfo.token) {
+      dispatch({
+        type: USER_PROFILE_FAIL,
+        payload: 'Token is missing or invalid',
+      });
+      return;
+    }
+
+    const config = { headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${userInfo.token}`
+      }
+    };
+
+    const { data } = await axios.put('/api/users/profile/update/', user, config);
+
+    dispatch({
+      type: USER_PROFILE_SUCCESS,
+      payload: data,
+    });
+    localStorage.setItem('userInfo', JSON.stringify(data));
+  } catch (error) {
+    dispatch({
+      type: USER_PROFILE_FAIL,
+      payload:
+        error.response && error.response.data.detail
+          ? error.response.data.detail
+          : error.message,
+    });
+  }
+}
+
 
 
 export const register = (username, email, password, role = 'Buyer') => async (dispatch) => {

@@ -13,10 +13,11 @@ class UserSerializer(serializers.ModelSerializer):
     isAdmin = serializers.SerializerMethodField(read_only=True)
     role = serializers.SerializerMethodField(read_only=True)
     email = serializers.SerializerMethodField(read_only=True)
+    paypal_account_id = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = CustomUser
-        fields = ['id', '_id', 'username', 'email', 'isAdmin', 'role']
+        fields = ['id', '_id', 'username', 'email', 'isAdmin', 'role', 'paypal_account_id']
 
     def get_username(self, obj):
         return obj.username
@@ -33,6 +34,9 @@ class UserSerializer(serializers.ModelSerializer):
     def get_email(self, obj):
         return obj.email
     
+    def get_paypal_account_id(self, obj):
+        return obj.paypal_account_id
+    
 class UserSerializerWithToken(UserSerializer):
     token = serializers.SerializerMethodField(read_only=True)
 
@@ -47,6 +51,8 @@ class UserSerializerWithToken(UserSerializer):
 class ChatRoomSerializer(serializers.ModelSerializer):
     buyer = UserSerializer(many=False, read_only=True)
     seller = UserSerializer(many=False, read_only=True)
+    house_id = serializers.IntegerField(source='house._id')
+    house_name = serializers.CharField(source='house.name')
     class Meta:
         model = ChatRoom
         fields = '__all__'
@@ -57,3 +63,33 @@ class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
         fields = '__all__'
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderItem
+        fields = '__all__'
+
+class OrderSerializer(serializers.ModelSerializer):
+    orderItems = serializers.SerializerMethodField(read_only=True)
+    buyer = serializers.SerializerMethodField(read_only=True)
+    paidAt = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Order
+        fields = ['_id', 'paymentMethod', 'taxPrice', 'totalPrice', 'isPaid', 'created_at', 'orderItems', 'buyer', 'paidAt']
+
+    def get_orderItems(self, obj):
+        items = OrderItem.objects.filter(order=obj)
+        serializer = OrderItemSerializer(items, many=True)
+        return serializer.data
+    
+    def get_buyer(self, obj):
+        buyer = obj.buyer
+        if buyer:
+            serializer = UserSerializer(buyer, many=False)
+            return serializer.data
+        return None
+    
+    def get_paidAt(self, obj):
+        return obj.paidAt
+

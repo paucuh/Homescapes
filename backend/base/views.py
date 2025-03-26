@@ -10,6 +10,8 @@ from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth import authenticate
 from rest_framework import status
 from django.contrib.auth.hashers import make_password
+from django.core.exceptions import PermissionDenied
+from django.utils import timezone
 
 @api_view(['GET'])
 def getHouses(request):
@@ -49,18 +51,6 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
-@api_view(['POST'])
-def registerUser(request):
-    data = request.data
-    user = CustomUser.objects.create_user(
-        username=data['username'],
-        email=data['email'],
-        password=data['password'],
-        role=data.get('role', 'Buyer')
-    )
-    serializer = UserSerializerWithToken(user, many=False)
-    return Response(serializer.data)
-
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -92,14 +82,22 @@ def create_house(request):
 def registerUser(request):
     data = request.data
     try:
+        # Extract the role from the request data (default to 'Buyer')
+        role = data.get('role', 'buyer').lower()
+
+        # Check if the user is a seller, then require paypal_account_id
+        if role == 'seller' and not data.get('paypal_account_id'):
+            return Response({'detail': 'PayPal account ID is required for sellers.'}, status=status.HTTP_400_BAD_REQUEST)
+
         # Create the user instance
         user = CustomUser.objects.create(
             username=data['username'],
             email=data['email'],
-            role=data.get('role', 'Buyer'),  # Default to Buyer if not passed
-            password=make_password(data['password'])  # Hash the password before saving
+            role=role,  # Ensure the role is set correctly (buyer/seller)
+            password=make_password(data['password']),  # Hash the password before saving
+            paypal_account_id=data.get('paypal_account_id', '')  # Store PayPal ID only for sellers
         )
-        
+
         # Create a token for the user
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
@@ -181,7 +179,7 @@ def deleteHouse(request, pk):
 @permission_classes([IsAuthenticated])
 def get_chat_messages(request, room_id):
     try:
-        buyer_id, seller_id = map(int, room_id.split('_'))
+        buyer_id, seller_id, house_id = map(int, room_id.split('_'))
 
         # Check both combinations (buyer-seller and seller-buyer)
         chat_room = ChatRoom.objects.filter(buyer_id=buyer_id, seller_id=seller_id).first()
@@ -203,7 +201,106 @@ def get_chat_messages(request, room_id):
 @permission_classes([IsAuthenticated])
 def user_chat_rooms(request):
     user = request.user
-    # ✅ Get all rooms where the user is either buyer or seller
     chat_rooms = ChatRoom.objects.filter(models.Q(buyer=user) | models.Q(seller=user))
     serializer = ChatRoomSerializer(chat_rooms, many=True)
     return Response(serializer.data)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def addOrderItems(request):
+    user = request.user
+    data = request.data
+
+    orderItems = data['orderItems']
+
+    if orderItems and len(orderItems) == 0:
+        return Response({'detail': 'No order items'}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        order = Order.objects.create(
+            buyer=user,
+            paymentMethod=data['paymentMethod'],
+            taxPrice=data['taxPrice'],
+            totalPrice=data['totalPrice'],
+        )
+
+        for i in orderItems:
+            house = House.objects.get(_id=i['house'])
+            item = OrderItem.objects.create(
+                house=house,
+                order=order,
+                name=i['name'],
+                price=i['price'],
+                image=house.image.url
+            )
+
+            house.available = False
+            house.save()
+        serializer = OrderSerializer(order, many=False)
+        return Response(serializer.data)
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getOrderbyId(request, pk):
+    user = request.user
+    try:
+        order = Order.objects.get(_id=pk)
+        if user.is_staff or order.buyer == user:
+            serializer = OrderSerializer(order, many=False)
+            return Response(serializer.data)
+        else:
+            return Response({'detail': 'You are not authorized to view this order.'}, status=status.HTTP_403_FORBIDDEN)
+    except:
+        return Response({'detail': 'Order does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def updateUserProfile(request):
+    user = request.user
+    serializer = UserSerializerWithToken(user, many=False)
+    data = request.data
+
+    # Safely get the 'username' and 'email', default to current values if not provided
+    user.username = data.get('username', user.username)  # If 'username' is not in data, use current name
+    user.email = data.get('email', user.email)  # If 'email' is not in data, use current email
+
+    # Safely handle password, update only if it's provided
+    password = data.get('password', '')  # Default to an empty string if password is not provided
+    if password:  # If password is not an empty string
+        user.password = make_password(password)
+
+    user.save()  # Save the user object with updated fields
+    return Response(serializer.data)  # Return the serialized user data as a response
+
+import logging
+
+logger = logging.getLogger(__name__)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getMyOrders(request):
+    print("User:", request.user)  # Debugging user info
+    if request.user.role.lower() != 'buyer':
+        raise PermissionDenied("You do not have permission to view these orders.")
+
+    user = request.user
+    orders = Order.objects.filter(buyer=user)
+    serializer = OrderSerializer(orders, many=True)
+    return Response(serializer.data)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def updateOrderToPaid(request, pk):
+    try:
+        order = Order.objects.get(_id=pk)
+    except Order.DoesNotExist:
+        return Response({'detail': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    order.isPaid = True
+    order.paidAt = timezone.now()  # Set paidAt timestamp to now
+    order.save()
+
+    return Response({
+        'message': 'Order marked as paid',
+        'isPaid': order.isPaid,
+        'paidAt': order.paidAt.strftime('%Y-%m-%d %H:%M:%S')  # Return formatted date
+    }, status=status.HTTP_200_OK)

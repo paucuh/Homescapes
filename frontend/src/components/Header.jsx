@@ -26,20 +26,20 @@ function Header() {
                     <Nav className="me-auto">
                         {userInfo && (
                             <Link to="/profile" className="nav-link">
-                                <i className="fa-solid fa-user"></i> Account
+                                <i className="fa-solid fas fa-user"></i> Account
                             </Link>
                         )}
 
                         {userInfo && (userInfo.role === 'Seller' || userInfo.role === 'admin') && (
                             <Link to="/create-listing" className="nav-link">
-                                <i className="fa-solid fa-plus"></i> Create Listing
+                                <i className="fa-solid fas fa-plus"></i> Create Listing
                             </Link>
                         )}
 
                         {/* ✅ New Messages Nav Link */}
                         {userInfo && (
                             <Link to="/messages" className="nav-link">
-                                <i className="fa-solid fa-comments"></i> Messages
+                                <i className="fa-solid fas fa-comments"></i> Messages
                             </Link>
                         )}
                     </Nav>

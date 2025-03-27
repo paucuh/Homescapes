@@ -130,7 +130,7 @@ export const updateHouse = (id, houseData) => async (dispatch, getState) => {
             },
         };
 
-        const { data } = await axios.put(`/api/house/${id}/`, houseData, config);  // Update the house
+        const { data } = await axios.put(`/api/house/update/${id}/`, houseData, config);  // Update the house
 
         dispatch({
             type: HOUSE_UPDATE_SUCCESS,

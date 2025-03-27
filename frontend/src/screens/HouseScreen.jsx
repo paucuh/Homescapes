@@ -82,6 +82,9 @@ function HouseScreen() {
                                         {house.available ? 'Available' : 'Not Available'}
                                     </span>
                                 </ListGroup.Item>
+                                <ListGroup.Item>
+                                    <strong>Seller: </strong> <span className="text-info">{house.lister}</span>
+                                </ListGroup.Item>
                             </ListGroup>
                             <div className="d-flex gap-2">
                                 {house.available === true && user && house && user._id !== house.lister && house.lister && user.role?.toLowerCase() !== 'seller' && (
@@ -91,7 +94,7 @@ function HouseScreen() {
                                 )}
 
                                 {user && house && user._id !== house.lister && house.lister && user.role?.toLowerCase() !== 'seller' && (
-                                    <Link to={`/chat/${user._id}/${house.lister}/${house._id}`}>
+                                    <Link to={`/chat/${user._id}/${house.lister}`}>
                                         <Button variant="success" className="mt-3">
                                             Chat with Seller
                                         </Button>

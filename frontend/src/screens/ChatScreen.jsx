@@ -14,10 +14,9 @@ const ChatScreen = () => {
     const userLogin = useSelector((state) => state.userLogin);
     const { userInfo } = userLogin;
 
-    const { buyerId, sellerId, houseId } = useParams();
-    const roomName = buyerId < sellerId 
-        ? `${buyerId}_${sellerId}_${houseId}` 
-        : `${sellerId}_${buyerId}_${houseId}`;
+    const { buyerId, sellerId } = useParams();
+    const roomId = `${buyerId}_${sellerId}`;  // Always buyer first, seller second
+
 
     useEffect(() => {
         if (!userInfo) {
@@ -33,7 +32,7 @@ const ChatScreen = () => {
                 const config = {
                     headers: { Authorization: `Bearer ${userInfo.token}` }
                 };
-                const { data } = await axios.get(`/api/chat/${roomName}/`, config);
+                const { data } = await axios.get(`/api/chat/${roomId}/`, config);
                 const formattedMessages = data.map(msg =>
                     `${msg.sender.id === userInfo._id ? 'You' : msg.sender.username}: ${msg.content}`
                 );
@@ -44,13 +43,13 @@ const ChatScreen = () => {
         };
 
         fetchChatMessages();
-    }, [roomName, userInfo]);
+    }, [roomId, userInfo]);
 
     // ✅ WebSocket setup
     useEffect(() => {
         if (!userInfo) return;
 
-        chatSocket.current = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${roomName}/`);
+        chatSocket.current = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${roomId}/`);
 
         chatSocket.current.onmessage = (e) => {
             const data = JSON.parse(e.data);
@@ -68,7 +67,7 @@ const ChatScreen = () => {
         return () => {
             chatSocket.current?.close();
         };
-    }, [roomName, userInfo]);
+    }, [roomId, userInfo]);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -99,12 +98,13 @@ const ChatScreen = () => {
 
             <Form onSubmit={sendMessageHandler}>
                 <Form.Group controlId="message">
-                    <Form.Control
-                        type="text"
-                        placeholder="Type your message..."
-                        value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
-                    />
+                <Form.Control
+                    type="text"
+                    placeholder="Type your message..."
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' ? sendMessageHandler(e) : null}
+                />
                 </Form.Group>
                 <Button type="submit" className="mt-3 w-100">Send</Button>
             </Form>

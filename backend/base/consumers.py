@@ -21,26 +21,31 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
     async def receive(self, text_data):
-        data = json.loads(text_data)
-        message = data['message']
-        sender_id = data['sender_id']
-        
-        # 🔥 Get sender to fetch the username
-        sender = await self.get_sender(sender_id)
+        try:
+            data = json.loads(text_data)
+            if 'message' not in data or 'sender_id' not in data:
+                print("❌ Invalid message format received:", data)
+                return  # Ignore invalid data
 
-        # ✅ Save to DB
-        await self.save_message(sender_id, message)
-        
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'chat_message',
-                'message': message,
-                'sender_id': sender_id,
-                'sender_username': sender.username if sender else "Unknown",
-                'timestamp': timezone.now().isoformat(),
-            }
-        )
+            message = data['message']
+            sender_id = data['sender_id']
+
+            sender = await self.get_sender(sender_id)
+            await self.save_message(sender_id, message)
+
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'message': message,
+                    'sender_id': sender_id,
+                    'sender_username': sender.username if sender else "Unknown",
+                    'timestamp': timezone.now().isoformat(),
+                }
+            )
+        except Exception as e:
+            print(f"❌ Error processing message: {e}")
+
     async def chat_message(self, event):
         await self.send(text_data=json.dumps({
             'message': event['message'],
@@ -52,39 +57,27 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def save_message(self, sender_id, message):
         try:
-            sender = CustomUser.objects.get(id=sender_id)
+            buyer_id, seller_id = map(int, self.room_id.split('_'))
 
-            # 🔥 Extract IDs from the room_id (example: "8_9")
-            id1, id2, house_id = map(int, self.room_id.split('_'))
+            buyer = CustomUser.objects.get(id=buyer_id)
+            seller = CustomUser.objects.get(id=seller_id)
 
-            # 🔥 Fetch both users
-            user1 = CustomUser.objects.get(id=id1)
-            user2 = CustomUser.objects.get(id=id2)
+            # Ensure correct roles
+            if buyer.role.lower() != 'buyer' or seller.role.lower() != 'seller':
+                print("❌ Invalid chat participants: Incorrect roles")
+                return
 
-            house = House.objects.get(_id=house_id)
-
-            if user1.role == 'Buyer' and user2.role == 'Seller':
-                buyer, seller = user1, user2
-            elif user2.role == 'Buyer' and user1.role == 'Seller':
-                buyer, seller = user2, user1
-            else:
-                raise ValueError("Invalid chat participants: No Buyer/Seller role match")
-
-            # 🔥 Get or create the ChatRoom
             chat_room, created = ChatRoom.objects.get_or_create(
                 buyer=buyer,
                 seller=seller,
-                house=house,
                 defaults={'created_at': timezone.now()}
             )
             print(f"✅ ChatRoom ID: {chat_room.id} | Created: {created}")
 
-            # 🔥 Create the message
-            Message.objects.create(room=chat_room, sender=sender, content=message)
-            print(f"✅ Message saved to room {chat_room.id}")
+            sender = CustomUser.objects.get(id=sender_id)
+            msg = Message.objects.create(room=chat_room, sender=sender, content=message)
+            print(f"✅ Message saved: {msg.content} to ChatRoom ID: {chat_room.id}")
 
-        except CustomUser.DoesNotExist as e:
-            print(f"❌ User not found: {e}")
         except Exception as e:
             print(f"❌ Error saving message: {e}")
 

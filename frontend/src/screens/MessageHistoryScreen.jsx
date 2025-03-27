@@ -24,10 +24,7 @@ const MessageHistoryScreen = () => {
   const handleChatClick = (chat) => {
     const buyerId = chat.buyer.id;
     const sellerId = chat.seller.id;
-    const houseId = chat.house_id;  // ✅ Get house_id
-    const roomId = buyerId < sellerId 
-        ? `${buyerId}/${sellerId}/${houseId}` 
-        : `${sellerId}/${buyerId}/${houseId}`;
+    const roomId = `${buyerId}/${sellerId}/`;
     navigate(`/chat/${roomId}`);
   };
 
@@ -67,12 +64,6 @@ const MessageHistoryScreen = () => {
                   </div>
                   <div className="text-muted">
                     {new Date(chat.created_at).toLocaleDateString()}
-                  </div>
-                  <div>
-                    <strong>Message: </strong> {chat.last_message ? chat.last_message.content : 'No messages yet'}
-                  </div>
-                  <div className="mt-2">
-                    🏠 <strong>House:</strong> {chat.house_name || 'N/A'}
                   </div>
                 </ListGroup.Item>
               );

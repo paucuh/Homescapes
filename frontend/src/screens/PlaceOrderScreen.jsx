@@ -17,16 +17,13 @@ function PlaceOrderScreen() {
     const dispatch = useDispatch()
 
     const itemsPrice = cart.cartItems?.reduce((acc, item) => acc + (Number(item.price) || 0), 0).toFixed(2);
-    const taxPrice = (0.6 * itemsPrice).toFixed(2);
+    const taxPrice = (0.06 * itemsPrice).toFixed(2);
     const totalPrice = (Number(itemsPrice) + Number(taxPrice)).toFixed(2);
 
     useEffect(() => {
         if (success) {
             navigate(`/order/${order._id}`)
             dispatch({ type: ORDER_CREATE_RESET })
-        }
-        if (!cart.paymentMethod || cart.paymentMethod === '') {
-            navigate('/payment')
         }
     }, [navigate, success, cart, order, dispatch])
     

@@ -19,7 +19,7 @@ const HouseCreateScreen = () => {
 
     // ✅ Restrict access to Sellers and Admins only
     useEffect(() => {
-        if (!userInfo || (userInfo.role !== 'Seller' && userInfo.role !== 'admin')) {
+        if (!userInfo || (userInfo.role.toLowerCase() !== 'seller' && userInfo.role.toLowerCase() !== 'admin')) {
             navigate('/');  // Redirect unauthorized users
         }
     }, [userInfo, navigate]);

@@ -135,13 +135,13 @@ export const updateUserProfile = (user) => async (dispatch, getState) => {
 
 
 
-export const register = (username, email, password, role = 'Buyer') => async (dispatch) => {
+export const register = (username, email, password, role = 'Buyer', paypal_account_id) => async (dispatch) => {
   try {
     dispatch({ type: USER_REGISTER_REQUEST });
 
     const config = { headers: { 'Content-Type': 'application/json' } };
 
-    const { data } = await axios.post('/api/users/register/', { username, email, password, role }, config);
+    const { data } = await axios.post('/api/users/register/', { username, email, password, role, paypal_account_id }, config);
 
     console.log('Registration successful, received data:', data); // Add this for debugging
 

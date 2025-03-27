@@ -9,6 +9,7 @@ const RegisterScreen = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [role, setRole] = useState('Buyer');
+    const [paypal_account_id, setPaypalAccountId] = useState('');
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -28,7 +29,7 @@ const RegisterScreen = () => {
 
     const submitHandler = (e) => {
         e.preventDefault();
-        dispatch(register(username, email, password, role));
+        dispatch(register(username, email, password, role, paypal_account_id));
     };
 
     return (
@@ -79,6 +80,16 @@ const RegisterScreen = () => {
                             <option value="Buyer">Buyer</option>
                             <option value="Seller">Seller</option>
                         </Form.Select>
+                    </Form.Group>
+
+                    <Form.Group className="mb-3">
+                        <Form.Label>Paypal ID</Form.Label>
+                        <Form.Control
+                            type="text"
+                            placeholder="Enter Paypal ID"
+                            value={paypal_account_id}
+                            onChange={(e) => setPaypalAccountId(e.target.value)}
+                        />
                     </Form.Group>
 
                     <Button type="submit" variant="primary" className="w-100">Register</Button>

@@ -30,7 +30,7 @@ function Header() {
                             </Link>
                         )}
 
-                        {userInfo && (userInfo.role === 'Seller' || userInfo.role === 'admin') && (
+                        {userInfo && userInfo.role && (userInfo.role.toLowerCase() === 'seller' || userInfo.role.toLowerCase() === 'admin') && (
                             <Link to="/create-listing" className="nav-link">
                                 <i className="fa-solid fas fa-plus"></i> Create Listing
                             </Link>

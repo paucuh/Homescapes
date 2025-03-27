@@ -74,10 +74,9 @@ class House(models.Model):
 class ChatRoom(models.Model):
     buyer = models.ForeignKey(CustomUser, related_name='chat_buyer', on_delete=models.CASCADE)
     seller = models.ForeignKey(CustomUser, related_name='chat_seller', on_delete=models.CASCADE)
-    house = models.ForeignKey(House, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
-        unique_together = ('buyer', 'seller', 'house')
+        unique_together = ('buyer', 'seller')
 
     created_at = models.DateTimeField(auto_now_add=True)
 

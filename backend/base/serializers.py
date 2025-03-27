@@ -3,9 +3,18 @@ from .models import *
 from rest_framework_simplejwt.tokens import RefreshToken
 
 class HouseSerializer(serializers.ModelSerializer):
+    lister = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = House
         fields = '__all__'
+
+    def get_lister(self, obj):
+        return obj.lister.username
+
+    def create(self, validated_data):
+        validated_data['available'] = True
+        return super().create(validated_data)
 
 class UserSerializer(serializers.ModelSerializer):
     username = serializers.SerializerMethodField(read_only=True)
@@ -51,8 +60,6 @@ class UserSerializerWithToken(UserSerializer):
 class ChatRoomSerializer(serializers.ModelSerializer):
     buyer = UserSerializer(many=False, read_only=True)
     seller = UserSerializer(many=False, read_only=True)
-    house_id = serializers.IntegerField(source='house._id')
-    house_name = serializers.CharField(source='house.name')
     class Meta:
         model = ChatRoom
         fields = '__all__'

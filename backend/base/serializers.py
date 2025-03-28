@@ -11,7 +11,7 @@ class HouseSerializer(serializers.ModelSerializer):
 
     def get_lister(self, obj):
         # Accessing the 'lister_id' field, which represents the ForeignKey to CustomUser
-        return obj.lister_id if obj.lister else None  # Access the 'lister_id' directly
+        return obj.listerid
 
     def create(self, validated_data):
         validated_data['available'] = True

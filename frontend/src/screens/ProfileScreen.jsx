@@ -94,7 +94,7 @@ function ProfileScreen() {
                 <Form.Control
                   type="text"
                   value={paypal_account_id}
-                  onChange={(e) => setPaypalAccountId(e.target.value)}
+                  onChange={(e) => setPaypal_account_id(e.target.value)}
                   required
                 />
               </Form.Group>

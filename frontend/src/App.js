@@ -33,7 +33,7 @@ function App() {
             <Route path="/search/:keyword" element={<SearchScreen />} />
             <Route path="/house/update/:id" element={<UpdateHouseScreen />} />
             <Route path="/messages" element={<MessageHistoryScreen />} />
-            <Route path="/chat/:buyerId_:sellerId" element={<ChatScreen />} />
+            <Route path="/chat/:roomId" element={<ChatScreen />} />
             <Route path='/payment' element={<PaymentScreen />} />
             <Route path='/cart/:id?' element={<CartScreen />} />
             <Route path='/placeorder' element={<PlaceOrderScreen />} />

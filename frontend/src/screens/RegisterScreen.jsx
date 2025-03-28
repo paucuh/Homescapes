@@ -8,7 +8,7 @@ const RegisterScreen = () => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [role, setRole] = useState('Buyer');
+    const [role, setRole] = useState('buyer');
     const [paypal_account_id, setPaypalAccountId] = useState('');
 
     const dispatch = useDispatch();
@@ -19,7 +19,7 @@ const RegisterScreen = () => {
 
     useEffect(() => {
         if (userInfo) {
-            if (userInfo.role === 'Seller') {
+            if (userInfo.role === 'seller') {
                 navigate('/create-listing');  // Redirect Sellers to the listing creation page
             } else {
                 navigate('/');  // Buyers go to the homepage
@@ -77,8 +77,8 @@ const RegisterScreen = () => {
                     <Form.Group className="mb-3">
                         <Form.Label>Role</Form.Label>
                         <Form.Select value={role} onChange={(e) => setRole(e.target.value)}>
-                            <option value="Buyer">Buyer</option>
-                            <option value="Seller">Seller</option>
+                            <option value="buyer">Buyer</option>
+                            <option value="seller">Seller</option>
                         </Form.Select>
                     </Form.Group>
 

@@ -3,7 +3,7 @@ from .models import *
 from rest_framework_simplejwt.tokens import RefreshToken
 
 class HouseSerializer(serializers.ModelSerializer):
-    lister = serializers.SerializerMethodField(read_only=True)
+    lister = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all())
 
     class Meta:
         model = House

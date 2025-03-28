@@ -1,6 +1,6 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .models import CustomUser, ChatRoom, Message, House
+from .models import CustomUser, ChatRoom, Message
 from channels.db import database_sync_to_async
 from django.utils import timezone
 
@@ -18,7 +18,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             print(f"❌ Error parsing room_id: {e}")
             await self.close()
 
-
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
@@ -33,6 +32,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
             sender_id = data['sender_id']
 
             sender = await self.get_sender(sender_id)
+            if sender is None:
+                print(f"❌ Sender with ID {sender_id} does not exist.")
+                return  # Ignore invalid sender
+
             await self.save_message(sender_id, message)
 
             await self.channel_layer.group_send(
@@ -80,6 +83,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             msg = Message.objects.create(room=chat_room, sender=sender, content=message)
             print(f"✅ Message saved: {msg.content} to ChatRoom ID: {chat_room.id}")
 
+        except CustomUser.DoesNotExist as e:
+            print(f"❌ Error: User does not exist - {e}")
         except Exception as e:
             print(f"❌ Error saving message: {e}")
 

@@ -95,7 +95,7 @@ function HouseScreen() {
                                 )}
 
                                 {user && house && user._id !== house.lister && house.lister && user.role?.toLowerCase() !== 'seller' && (
-                                    <Link to={`/chat/${user._id}/${house.lister_id}`}>
+                                    <Link to={`/chat/${user._id}_${house.lister_id}`}>
                                         <Button variant="success" className="mt-3">
                                             Chat with Seller
                                         </Button>

@@ -14,16 +14,20 @@ const ChatScreen = () => {
     const userLogin = useSelector((state) => state.userLogin);
     const { userInfo } = userLogin;
 
-    const { buyerId, sellerId } = useParams();
-    const roomId = `${buyerId}_${sellerId}`;  // Always buyer first, seller second
+    const { roomId } = useParams();
+    const [buyerId, sellerId] = roomId.split('_'); // Extract buyerId and sellerId
+    console.log("Buyer ID:", buyerId, "Seller ID:", sellerId);
 
-
+    // ✅ Redirect to login if user is not logged in
     useEffect(() => {
         if (!userInfo) {
             navigate('/login');
         }
     }, [userInfo, navigate]);
 
+
+
+    // ✅ Fetch chat history
     useEffect(() => {
         if (!userInfo) return;
 
@@ -59,6 +63,8 @@ const ChatScreen = () => {
                 `${data.sender_id === userInfo._id ? 'You' : data.sender_username}: ${data.message}`
             ]);
         };
+
+        
 
         chatSocket.current.onclose = () => {
             console.log('WebSocket closed');
@@ -98,13 +104,12 @@ const ChatScreen = () => {
 
             <Form onSubmit={sendMessageHandler}>
                 <Form.Group controlId="message">
-                <Form.Control
-                    type="text"
-                    placeholder="Type your message..."
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' ? sendMessageHandler(e) : null}
-                />
+                    <Form.Control
+                        type="text"
+                        placeholder="Type your message..."
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
+                    />
                 </Form.Group>
                 <Button type="submit" className="mt-3 w-100">Send</Button>
             </Form>

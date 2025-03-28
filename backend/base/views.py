@@ -179,16 +179,23 @@ def deleteHouse(request, pk):
 @permission_classes([IsAuthenticated])
 def get_chat_messages(request, room_id):
     try:
-        buyer_id, seller_id = room_id.split('_')
-        buyer_id, seller_id = int(buyer_id), int(seller_id)
+        buyer_id, seller_id = map(int, room_id.split('_'))
 
-        chat_room = ChatRoom.objects.get(buyer_id=buyer_id, seller_id=seller_id,)
-    except (ValueError, ChatRoom.DoesNotExist):
-        return Response({'detail': 'Chat room not found.'}, status=404)
+        # Check both combinations (buyer-seller and seller-buyer)
+        chat_room = ChatRoom.objects.filter(buyer_id=buyer_id, seller_id=seller_id).first()
+        if not chat_room:
+            chat_room = ChatRoom.objects.filter(buyer_id=seller_id, seller_id=buyer_id).first()
 
-    messages = chat_room.messages.all().order_by('timestamp')
-    serializer = MessageSerializer(messages, many=True)
-    return Response(serializer.data)
+        if not chat_room:
+            return Response({'detail': 'Chat room does not exist.'}, status=404)
+
+        messages = chat_room.messages.all().order_by('timestamp')
+        serializer = MessageSerializer(messages, many=True)
+        return Response(serializer.data)
+    
+    except Exception as e:
+        print(f"❌ Error fetching messages: {e}")
+        return Response({'detail': 'Invalid room or server error.'}, status=400)
     
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -196,6 +203,7 @@ def user_chat_rooms(request):
     user = request.user
     chat_rooms = ChatRoom.objects.filter(models.Q(buyer=user) | models.Q(seller=user))
     serializer = ChatRoomSerializer(chat_rooms, many=True)
+    print(chat_rooms)
     return Response(serializer.data)
 
 @api_view(['POST'])

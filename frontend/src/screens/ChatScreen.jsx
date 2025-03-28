@@ -15,15 +15,18 @@ const ChatScreen = () => {
     const { userInfo } = userLogin;
 
     const { buyerId, sellerId } = useParams();
-    const roomId = `${buyerId}_${sellerId}`;  // Always buyer first, seller second
+    const roomId = buyerId < sellerId ? `${buyerId}_${sellerId}` : `${sellerId}_${buyerId}`;
 
-
+    // ✅ Redirect to login if user is not logged in
     useEffect(() => {
         if (!userInfo) {
             navigate('/login');
         }
     }, [userInfo, navigate]);
 
+    `${roomId}`
+
+    // ✅ Fetch chat history
     useEffect(() => {
         if (!userInfo) return;
 
@@ -32,7 +35,7 @@ const ChatScreen = () => {
                 const config = {
                     headers: { Authorization: `Bearer ${userInfo.token}` }
                 };
-                const { data } = await axios.get(`https://homescapes-backend-feb38c088c8f.herokuapp.com/api/chat/${roomId}/`, config);
+                const { data } = await axios.get(`/api/chat/${roomId}/`, config);
                 const formattedMessages = data.map(msg =>
                     `${msg.sender.id === userInfo._id ? 'You' : msg.sender.username}: ${msg.content}`
                 );
@@ -48,30 +51,28 @@ const ChatScreen = () => {
     // ✅ WebSocket setup
     useEffect(() => {
         if (!userInfo) return;
-   
-        chatSocket.current = new WebSocket(`wss://homescapes-backend-feb38c088c8f.herokuapp.com/ws/chat/${roomId}/`);
-   
-        chatSocket.current.onopen = () => {
-            console.log('WebSocket connected');
-        };
-   
+
+        chatSocket.current = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${roomId}/`);
+
         chatSocket.current.onmessage = (e) => {
             const data = JSON.parse(e.data);
+        
             setMessages((prev) => [
                 ...prev,
                 `${data.sender_id === userInfo._id ? 'You' : data.sender_username}: ${data.message}`
             ]);
         };
-   
+
+        
+
         chatSocket.current.onclose = () => {
             console.log('WebSocket closed');
         };
-   
+
         return () => {
             chatSocket.current?.close();
         };
     }, [roomId, userInfo]);
-   
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -102,13 +103,12 @@ const ChatScreen = () => {
 
             <Form onSubmit={sendMessageHandler}>
                 <Form.Group controlId="message">
-                <Form.Control
-                    type="text"
-                    placeholder="Type your message..."
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' ? sendMessageHandler(e) : null}
-                />
+                    <Form.Control
+                        type="text"
+                        placeholder="Type your message..."
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
+                    />
                 </Form.Group>
                 <Button type="submit" className="mt-3 w-100">Send</Button>
             </Form>

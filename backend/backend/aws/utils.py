@@ -1,7 +1,11 @@
 from storages.backends.s3boto3 import S3Boto3Storage
 
 class StaticRootS3BotoStorage(S3Boto3Storage):
-    location = "static"
+    location = 'static'
+    file_overwrite = False
+    custom_domain = True
 
 class MediaRootS3BotoStorage(S3Boto3Storage):
-    location = "media"
+    location = 'media'
+    file_overwrite = False
+    custom_domain = True

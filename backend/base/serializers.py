@@ -4,6 +4,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 class HouseSerializer(serializers.ModelSerializer):
     lister = serializers.SerializerMethodField(read_only=True)
+    lister_id = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = House
@@ -11,6 +12,9 @@ class HouseSerializer(serializers.ModelSerializer):
 
     def get_lister(self, obj):
         return obj.lister.username
+
+    def get_lister_id(self, obj):
+        return obj.lister.id
 
     def create(self, validated_data):
         validated_data['available'] = True

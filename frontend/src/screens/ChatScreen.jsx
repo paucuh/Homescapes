@@ -14,8 +14,9 @@ const ChatScreen = () => {
     const userLogin = useSelector((state) => state.userLogin);
     const { userInfo } = userLogin;
 
-    const { buyerId, sellerId } = useParams();
-    const roomId = buyerId < sellerId ? `${buyerId}_${sellerId}` : `${sellerId}_${buyerId}`;
+    const { roomId } = useParams();
+    const [buyerId, sellerId] = roomId.split('_'); // Extract buyerId and sellerId
+    console.log("Buyer ID:", buyerId, "Seller ID:", sellerId);
 
     // ✅ Redirect to login if user is not logged in
     useEffect(() => {
@@ -24,7 +25,7 @@ const ChatScreen = () => {
         }
     }, [userInfo, navigate]);
 
-    `${roomId}`
+
 
     // ✅ Fetch chat history
     useEffect(() => {
@@ -35,7 +36,7 @@ const ChatScreen = () => {
                 const config = {
                     headers: { Authorization: `Bearer ${userInfo.token}` }
                 };
-                const { data } = await axios.get(`/api/chat/${roomId}/`, config);
+                const { data } = await axios.get(`https://homescapes-backend-feb38c088c8f.herokuapp.com/api/chat/${roomId}/`, config);
                 const formattedMessages = data.map(msg =>
                     `${msg.sender.id === userInfo._id ? 'You' : msg.sender.username}: ${msg.content}`
                 );
@@ -52,7 +53,7 @@ const ChatScreen = () => {
     useEffect(() => {
         if (!userInfo) return;
 
-        chatSocket.current = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${roomId}/`);
+        chatSocket.current = new WebSocket(`ws://homescapes-backend-feb38c088c8f.herokuapp.com/ws/chat/${roomId}/`);
 
         chatSocket.current.onmessage = (e) => {
             const data = JSON.parse(e.data);

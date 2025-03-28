@@ -10,7 +10,7 @@ class HouseSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_lister(self, obj):
-        return obj.lister.id
+        return obj.lister._id
 
     def create(self, validated_data):
         validated_data['available'] = True

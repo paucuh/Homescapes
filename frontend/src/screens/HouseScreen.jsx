@@ -26,13 +26,15 @@ function HouseScreen() {
         dispatch(listHouseDetails(id));
         dispatch(getUserProfile());
     }, [dispatch, id]);
+    console.log(house)
+
 
     return (
         <Container className="my-4">
             {(loading || !user || !house) ? (
                 <Loader />
             ) : error ? (
-                <Message variant="danger">{error.message}</Message>
+                <Message variant="danger">{error}</Message>
             ) : (
                 <>
                     <Link to="/" className="btn btn-dark my-3">

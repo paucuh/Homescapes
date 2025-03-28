@@ -24,7 +24,7 @@ const MessageHistoryScreen = () => {
   const handleChatClick = (chat) => {
     const buyerId = chat.buyer.id;
     const sellerId = chat.seller.id;
-    const roomId = `${buyerId}/${sellerId}/`;
+    const roomId = `${buyerId}_${sellerId}/`;
     navigate(`/chat/${roomId}`);
   };
 

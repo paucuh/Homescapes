@@ -173,6 +173,7 @@ def deleteHouse(request, pk):
 
     except House.DoesNotExist:
         return Response({"detail": "House not found."}, status=status.HTTP_404_NOT_FOUND)
+    
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -202,6 +203,7 @@ def user_chat_rooms(request):
     user = request.user
     chat_rooms = ChatRoom.objects.filter(models.Q(buyer=user) | models.Q(seller=user))
     serializer = ChatRoomSerializer(chat_rooms, many=True)
+    print(chat_rooms)
     return Response(serializer.data)
 
 @api_view(['POST'])

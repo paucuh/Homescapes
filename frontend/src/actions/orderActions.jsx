@@ -29,7 +29,7 @@ export const createOrder = (order) => async (dispatch, getState) => {
             },
         };
 
-        const { data } = await axios.post('/api/orders/add/', order, config);
+        const { data } = await axios.post('https://homescapes-backend-feb38c088c8f.herokuapp.com/api/orders/add/', order, config);
 
         dispatch({ type: ORDER_CREATE_SUCCESS, payload: data });
     
@@ -63,7 +63,7 @@ export const getOrderDetails = (id) => async (dispatch, getState) => {
             },
         };
 
-        const { data } = await axios.get(`/api/order/${id}/`, config);
+        const { data } = await axios.get(`https://homescapes-backend-feb38c088c8f.herokuapp.com/api/order/${id}/`, config);
         console.log('Fetched Order:', data)
 
         dispatch({ type: ORDER_DETAILS_SUCCESS, payload: data });
@@ -92,7 +92,7 @@ export const getMyOrders = () => async (dispatch, getState) => {
         },
       };
   
-      const { data } = await axios.get('/api/orders/myorders/', config);
+      const { data } = await axios.get('https://homescapes-backend-feb38c088c8f.herokuapp.com/api/orders/myorders/', config);
   
       console.log('Orders Fetched:', data);  // Debugging API response
   
@@ -121,7 +121,7 @@ export const payOrder = (id, paymentResult) => async (dispatch, getState) => {
             },
         }
 
-        const { data } = await axios.put(`/api/orders/${id}/pay/`, paymentResult, config);
+        const { data } = await axios.put(`https://homescapes-backend-feb38c088c8f.herokuapp.com/api/orders/${id}/pay/`, paymentResult, config);
 
         dispatch({ type: ORDER_PAY_SUCCESS, payload: data });
     } catch (error) {

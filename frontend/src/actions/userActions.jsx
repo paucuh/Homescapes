@@ -24,7 +24,7 @@ export const login = (email, password) => async (dispatch) => {
           }
       }
       const {data} = await axios.post(
-          '/api/users/login',
+          'https://homescapes-backend-feb38c088c8f.herokuapp.com/api/users/login',
           {'email': email, 'password': password},
           config
           )
@@ -76,7 +76,7 @@ export const getUserProfile = () => async (dispatch, getState) => {
 
     const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
 
-    const { data } = await axios.get('/api/users/profile/', config);
+    const { data } = await axios.get('https://homescapes-backend-feb38c088c8f.herokuapp.com/api/users/profile/', config);
 
     dispatch({
       type: USER_PROFILE_SUCCESS,
@@ -115,7 +115,7 @@ export const updateUserProfile = (user) => async (dispatch, getState) => {
       }
     };
 
-    const { data } = await axios.put('/api/users/profile/update/', user, config);
+    const { data } = await axios.put('https://homescapes-backend-feb38c088c8f.herokuapp.com/api/users/profile/update/', user, config);
 
     dispatch({
       type: USER_PROFILE_SUCCESS,
@@ -141,7 +141,7 @@ export const register = (username, email, password, role = 'Buyer', paypal_accou
 
     const config = { headers: { 'Content-Type': 'application/json' } };
 
-    const { data } = await axios.post('/api/users/register/', { username, email, password, role, paypal_account_id }, config);
+    const { data } = await axios.post('https://homescapes-backend-feb38c088c8f.herokuapp.com/api/users/register/', { username, email, password, role, paypal_account_id }, config);
 
     console.log('Registration successful, received data:', data); // Add this for debugging
 

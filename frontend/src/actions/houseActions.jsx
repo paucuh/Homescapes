@@ -19,7 +19,7 @@ import axios from "axios";
 export const listHouses = () => async (dispatch) => {
     try {
         dispatch({ type: HOUSE_LIST_REQUEST });
-        const { data } = await axios.get(`/api/houses/`);
+        const { data } = await axios.get(`https://homescapes-backend-feb38c088c8f.herokuapp.com/api/houses/`);
         dispatch({ type: HOUSE_LIST_SUCCESS, payload: data });
     } catch (error) {
         dispatch({
@@ -35,7 +35,7 @@ export const listHouses = () => async (dispatch) => {
 export const listHouseDetails = (id) => async (dispatch) => {
     try {
         dispatch({ type: HOUSE_DETAILS_REQUEST });
-        const { data } = await axios.get(`/api/house/${id}/`);
+        const { data } = await axios.get(`https://homescapes-backend-feb38c088c8f.herokuapp.com/api/house/${id}/`);
         dispatch({ type: HOUSE_DETAILS_SUCCESS, payload: data });
     } catch (error) {
         dispatch({
@@ -59,7 +59,7 @@ export const createHouse = (houseData) => async (dispatch, getState) => {
             },
         };
   
-        const { data } = await axios.post('/api/houses/create/', houseData, config);
+        const { data } = await axios.post('https://homescapes-backend-feb38c088c8f.herokuapp.com/api/houses/create/', houseData, config);
   
         dispatch({ type: CREATE_HOUSE_SUCCESS, payload: data });
     } catch (error) {
@@ -74,7 +74,7 @@ export const searchHouses = (address) => async (dispatch) => {
     try {
         dispatch({ type: HOUSE_LIST_REQUEST });
 
-        const { data } = await axios.get(`/api/houses/search/?address=${address}`);  // Use the new API endpoint
+        const { data } = await axios.get(`https://homescapes-backend-feb38c088c8f.herokuapp.com/api/houses/search/?address=${address}`);  // Use the new API endpoint
 
         dispatch({
             type: HOUSE_LIST_SUCCESS,
@@ -104,7 +104,7 @@ export const listUserHouses = () => async (dispatch, getState) => {
             },
         };
 
-        const { data } = await axios.get('/api/user/houses/', config);  // Make API call to get houses listed by the user
+        const { data } = await axios.get('https://homescapes-backend-feb38c088c8f.herokuapp.com/api/user/houses/', config);  // Make API call to get houses listed by the user
 
         dispatch({ type: USER_HOUSES_SUCCESS, payload: data });
     } catch (error) {
@@ -130,7 +130,7 @@ export const updateHouse = (id, houseData) => async (dispatch, getState) => {
             },
         };
 
-        const { data } = await axios.put(`/api/house/update/${id}/`, houseData, config);  // Update the house
+        const { data } = await axios.put(`https://homescapes-backend-feb38c088c8f.herokuapp.com/api/house/update/${id}/`, houseData, config);  // Update the house
 
         dispatch({
             type: HOUSE_UPDATE_SUCCESS,
@@ -158,7 +158,7 @@ export const deleteHouse = (id) => async (dispatch, getState) => {
             },
         };
 
-        await axios.delete(`/api/houses/delete/${id}/`, config);
+        await axios.delete(`https://homescapes-backend-feb38c088c8f.herokuapp.com/api/houses/delete/${id}/`, config);
 
         dispatch({ type: 'HOUSE_DELETE_SUCCESS' });
     } catch (error) {

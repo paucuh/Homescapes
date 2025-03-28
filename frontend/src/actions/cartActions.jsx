@@ -2,7 +2,7 @@ import axios from "axios";
 import { CART_ADD_ITEM, CART_REMOVE_ITEM } from "../constants/cartConstants.jsx";
 
 export const addToCart = (id, qty) => async (dispatch, getState) => {
-    const { data } = await axios.get(`/api/house/${id}`);
+    const { data } = await axios.get(`https://homescapes-backend-feb38c088c8f.herokuapp.com/api/house/${id}`);
     dispatch({
         type: CART_ADD_ITEM,
         payload: {

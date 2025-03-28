@@ -24,11 +24,11 @@ function HouseScreen() {
 
     useEffect(() => {
         dispatch(listHouseDetails(id));
-        console.log(house.lister)
         dispatch(getUserProfile());
     }, [dispatch, id]);
-
-
+    
+    console.log('House data:', house);  // Check the whole house data
+    
     return (
         <Container className="my-4">
             {(loading || !user || !house) ? (
@@ -40,7 +40,6 @@ function HouseScreen() {
                     <Link to="/" className="btn btn-dark my-3">
                         &larr; Go Back
                     </Link>
-
                     <Row className="justify-content-center">
                         <Col md={6} className="d-flex align-items-center justify-content-center">
                             <div 
@@ -60,7 +59,7 @@ function HouseScreen() {
                                 />
                             </div>
                         </Col>
-
+    
                         <Col md={4}>
                             <ListGroup variant="flush" className="shadow-sm p-3 rounded">
                                 <ListGroup.Item>
@@ -84,31 +83,33 @@ function HouseScreen() {
                                     </span>
                                 </ListGroup.Item>
                                 <ListGroup.Item>
-                                    <strong>Seller: </strong> <span className="text-info">{house.lister}</span>
+                                    <strong>Seller: </strong> 
+                                    <span className="text-info">{house.lister ? house.lister.email : 'No seller available'}</span>
                                 </ListGroup.Item>
                             </ListGroup>
+    
                             <div className="d-flex gap-2">
-                                {house.available === true && user && house && user._id !== house.lister && house.lister && user.role?.toLowerCase() !== 'seller' && (
-                                        <Button variant="primary" className="mt-3" onClick={addToOrderHandler}>
-                                            Buy Now
-                                        </Button>
+                                {house.available === true && user && house.lister && user._id !== house.lister.id && user.role?.toLowerCase() !== 'seller' && (
+                                    <Button variant="primary" className="mt-3" onClick={addToOrderHandler}>
+                                        Buy Now
+                                    </Button>
                                 )}
-
-                                {user && house && user._id !== house.lister && house.lister && user.role?.toLowerCase() !== 'seller' && (
-                                    <Link to={`/chat/${user._id}/${house.lister.id}`}>
+    
+                                {user && house.lister && user._id !== house.lister && user.role?.toLowerCase() !== 'seller' && (
+                                    <Link to={`/chat/${user._id}/${house.lister}`}>
                                         <Button variant="success" className="mt-3">
                                             Chat with Seller
                                         </Button>
                                     </Link>
                                 )}
-
-                            {user && house && user._id === house.lister && (
-                                <Link to={`/house/update/${house._id}`}>
-                                    <Button variant="primary" className="mt-3">
-                                        Edit House
-                                    </Button>
-                                </Link>
-                            )}
+    
+                                {user && house.lister && user._id === house.lister.id && (
+                                    <Link to={`/house/update/${house._id}`}>
+                                        <Button variant="primary" className="mt-3">
+                                            Edit House
+                                        </Button>
+                                    </Link>
+                                )}
                             </div>
                         </Col>
                     </Row>

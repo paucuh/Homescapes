@@ -6,16 +6,18 @@ from django.utils import timezone
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.room_id = self.scope['url_route']['kwargs']['room_id']  # <- Change this line
-        self.room_group_name = f"chat_{self.room_id}"
+        try:
+            self.room_id = self.scope['url_route']['kwargs']['room_id']
+            buyer_id, seller_id = map(int, self.room_id.split('_'))
+            self.room_group_name = f"chat_{self.room_id}"
 
-        print(f"Connecting to room: {self.room_id}")
+            print(f"Connecting to room: {self.room_id}")
+            await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+            await self.accept()
+        except ValueError as e:
+            print(f"❌ Error parsing room_id: {e}")
+            await self.close()
 
-        await self.channel_layer.group_add(
-            self.room_group_name,
-            self.channel_name
-        )
-        await self.accept()
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)

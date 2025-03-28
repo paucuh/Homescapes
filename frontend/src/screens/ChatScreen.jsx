@@ -32,7 +32,7 @@ const ChatScreen = () => {
                 const config = {
                     headers: { Authorization: `Bearer ${userInfo.token}` }
                 };
-                const { data } = await axios.get(`/api/chat/${roomId}/`, config);
+                const { data } = await axios.get(`https://homescapes-backend-feb38c088c8f.herokuapp.com/api/chat/${roomId}/`, config);
                 const formattedMessages = data.map(msg =>
                     `${msg.sender.id === userInfo._id ? 'You' : msg.sender.username}: ${msg.content}`
                 );
@@ -48,26 +48,30 @@ const ChatScreen = () => {
     // ✅ WebSocket setup
     useEffect(() => {
         if (!userInfo) return;
-
-        chatSocket.current = new WebSocket(`ws://127.0.0.1:8000/ws/chat/${roomId}/`);
-
+   
+        chatSocket.current = new WebSocket(`wss://homescapes-backend-feb38c088c8f.herokuapp.com/ws/chat/${roomId}/`);
+   
+        chatSocket.current.onopen = () => {
+            console.log('WebSocket connected');
+        };
+   
         chatSocket.current.onmessage = (e) => {
             const data = JSON.parse(e.data);
-        
             setMessages((prev) => [
                 ...prev,
                 `${data.sender_id === userInfo._id ? 'You' : data.sender_username}: ${data.message}`
             ]);
         };
-
+   
         chatSocket.current.onclose = () => {
             console.log('WebSocket closed');
         };
-
+   
         return () => {
             chatSocket.current?.close();
         };
     }, [roomId, userInfo]);
+   
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

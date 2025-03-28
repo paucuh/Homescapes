@@ -10,7 +10,6 @@ class HouseSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_lister(self, obj):
-        # Accessing the 'lister_id' field, which represents the ForeignKey to CustomUser
         return obj.listerid
 
     def create(self, validated_data):
@@ -35,7 +34,7 @@ class UserSerializer(serializers.ModelSerializer):
         return obj.username
 
     def get__id(self, obj):
-        return obj._id
+        return obj.id
     
     def get_isAdmin(self, obj):
         return obj.is_staff

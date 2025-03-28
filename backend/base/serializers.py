@@ -10,11 +10,13 @@ class HouseSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_lister(self, obj):
-        return obj.lister.username
+        # Accessing the 'lister_id' field, which represents the ForeignKey to CustomUser
+        return obj.lister_id if obj.lister else None  # Access the 'lister_id' directly
 
     def create(self, validated_data):
         validated_data['available'] = True
         return super().create(validated_data)
+
 
 class UserSerializer(serializers.ModelSerializer):
     username = serializers.SerializerMethodField(read_only=True)
@@ -29,10 +31,11 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', '_id', 'username', 'email', 'isAdmin', 'role', 'paypal_account_id']
 
     def get_username(self, obj):
+        
         return obj.username
 
     def get__id(self, obj):
-        return obj.id
+        return obj._id
     
     def get_isAdmin(self, obj):
         return obj.is_staff

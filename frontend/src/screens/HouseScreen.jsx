@@ -24,6 +24,7 @@ function HouseScreen() {
 
     useEffect(() => {
         dispatch(listHouseDetails(id));
+        console.log(house.lister)
         dispatch(getUserProfile());
     }, [dispatch, id]);
 
@@ -94,7 +95,7 @@ function HouseScreen() {
                                 )}
 
                                 {user && house && user._id !== house.lister && house.lister && user.role?.toLowerCase() !== 'seller' && (
-                                    <Link to={`/chat/${user._id}/${house.lister}`}>
+                                    <Link to={`/chat/${user._id}/${house.lister.id}`}>
                                         <Button variant="success" className="mt-3">
                                             Chat with Seller
                                         </Button>

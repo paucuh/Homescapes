@@ -103,7 +103,7 @@ function HouseScreen() {
                                     </Link>
                                 )}
     
-                                {user && house.lister && user._id === house.lister.id && (
+                                {user && house.lister && user._id === house.lister && (
                                     <Link to={`/house/update/${house._id}`}>
                                         <Button variant="primary" className="mt-3">
                                             Edit House

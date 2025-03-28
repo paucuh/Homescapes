@@ -3,14 +3,18 @@ from .models import *
 from rest_framework_simplejwt.tokens import RefreshToken
 
 class HouseSerializer(serializers.ModelSerializer):
-    lister = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all())
+    lister = serializers.SerializerMethodField(read_only=True)
+    lister_id = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = House
         fields = '__all__'
 
     def get_lister(self, obj):
-        return obj.lister._id
+        return obj.lister.username
+
+    def get_lister_id(self, obj):
+        return obj.lister.id
 
     def create(self, validated_data):
         validated_data['available'] = True

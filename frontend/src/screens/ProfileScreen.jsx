@@ -15,6 +15,7 @@ function ProfileScreen() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
+  const [paypal_account_id, setPaypal_account_id] = useState(""); // Add paypal_account_id for form
   const [successUpdate, setSuccessUpdate] = useState(false);
 
   const userProfile = useSelector((state) => state.userProfile);
@@ -36,6 +37,7 @@ function ProfileScreen() {
       setUsername(user.username);
       setEmail(user.email);
       setRole(user.role);
+      setPaypal_account_id(user.paypal_account_id); // Set paypal_account_id for form
       if (user.role.toLowerCase() === "buyer") {
         dispatch(getMyOrders());
       }
@@ -44,7 +46,7 @@ function ProfileScreen() {
 
   const handleUpdate = (e) => {
     e.preventDefault();
-    const updatedUser = { username, email, role };
+    const updatedUser = { username, email, role, paypal_account_id };
     dispatch(updateUserProfile(updatedUser));
     setSuccessUpdate(true);
   };
@@ -83,6 +85,16 @@ function ProfileScreen() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </Form.Group>
+
+              <Form.Group controlId="paypalAccountId" className="mb-3">
+                <Form.Label>PayPal Account ID</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={paypal_account_id}
+                  onChange={(e) => setPaypalAccountId(e.target.value)}
                   required
                 />
               </Form.Group>
@@ -204,3 +216,4 @@ function ProfileScreen() {
 }
 
 export default ProfileScreen;
+
